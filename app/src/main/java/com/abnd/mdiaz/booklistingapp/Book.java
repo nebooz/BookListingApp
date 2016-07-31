@@ -10,12 +10,11 @@ public class Book {
     private String mPublicationYear;
     private int mIsbn;
 
-    public Book(String title, String[] authors, String description, String publicationYear, int isbn) {
+    public Book(String title, String[] authors, String description) {
         mTitle = title;
         mAuthors = authors;
         mDescription = description;
-        mPublicationYear = publicationYear;
-        mIsbn = isbn;
+
     }
 
     public String getTitle() {
