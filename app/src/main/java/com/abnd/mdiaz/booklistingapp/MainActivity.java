@@ -16,9 +16,11 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 
@@ -158,8 +160,20 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected Book doInBackground(URL... urls) {
+
+            StringBuilder query = new StringBuilder();
+            query.append(BOOKS_QUERY_INIT);
+            try {
+                //Now the user can add blank spaces and other non-lettery stuff.
+                query.append(URLEncoder.encode(mText, "UTF-8"));
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+            query.append(BOOKS_MAX_RESULTS_STRING);
+            query.append(BOOKS_MAX_RESULTS_VALUE);
+
             // Create URL object
-            URL url = createUrl(BOOKS_QUERY_INIT + mText + BOOKS_MAX_RESULTS_STRING + BOOKS_MAX_RESULTS_VALUE);
+            URL url = createUrl(String.valueOf(query));
 
             // Perform HTTP request to the URL and receive a JSON response back
             String jsonResponse = "";
