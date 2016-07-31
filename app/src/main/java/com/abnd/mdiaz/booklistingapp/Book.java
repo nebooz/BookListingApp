@@ -5,12 +5,12 @@ package com.abnd.mdiaz.booklistingapp;
  */
 public class Book {
     private String mTitle;
-    private String[] mAuthors;
+    private String mAuthors;
     private String mDescription;
     private String mPublicationYear;
     private int mIsbn;
 
-    public Book(String title, String[] authors, String description) {
+    public Book(String title, String authors, String description) {
         mTitle = title;
         mAuthors = authors;
         mDescription = description;
@@ -21,7 +21,7 @@ public class Book {
         return mTitle;
     }
 
-    public String[] getAuthors() {
+    public String getAuthors() {
         return mAuthors;
     }
 

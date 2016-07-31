@@ -23,6 +23,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -115,20 +116,32 @@ public class MainActivity extends AppCompatActivity {
                 // Extract out the first feature (which is an earthquake)
                 JSONObject item = itemArray.getJSONObject(0);
                 JSONObject volume = item.getJSONObject("volumeInfo");
-                JSONArray authors = volume.getJSONArray("authors");
+                JSONArray authors = volume.optJSONArray("authors");
                 //JSONObject properties = item.getJSONObject("properties");
 
                 // Extract out the title, time, and tsunami values
                 String title = volume.getString("title");
-                String description = volume.getString("description");
+                String description = volume.optString("description");
 
-                String[] authorsArray = new String[1];
-                String author = authors.getString(0);
+                if (Objects.equals(description, "")) {
+                    description = "No description available.";
+                }
 
-                authorsArray[0] = author;
+                String authorsList = "No authors defined.";
+
+                if (authors != null) {
+                    StringBuilder authorsBuilder = new StringBuilder();
+                    for (int i = 0; i < authors.length(); i++) {
+                        authorsBuilder.append(authors.getString(i));
+                        if (i != authors.length() - 1) {
+                            authorsBuilder.append(", ");
+                        }
+                    }
+                    authorsList = authorsBuilder.toString();
+                }
 
                 // Create a new {@link Event} object
-                return new Book(title, authorsArray, description);
+                return new Book(title, authorsList, description);
             }
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing the book JSON results", e);
