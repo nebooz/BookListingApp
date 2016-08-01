@@ -3,9 +3,11 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:minHeight="100dp"
     android:orientation="vertical"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp"
+    android:paddingBottom="8dp"
+    android:paddingLeft="8dp"
+    android:paddingRight="8dp"
     android:paddingTop="8dp">
 
     <TextView
@@ -14,7 +16,9 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:textColor="#0D47A1"
+        android:textSize="16sp"
+        android:textStyle="bold"
         tools:text="Book Title" />
 
     <TextView
@@ -23,7 +27,9 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="1"
-        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#2196F3"
+        android:textSize="12sp"
+        android:textStyle="italic"
         tools:text="Book Authors" />
 
     <TextView
@@ -32,7 +38,8 @@
         android:layout_height="wrap_content"
         android:ellipsize="end"
         android:maxLines="3"
-        android:paddingTop="3dp"
-        android:textAppearance="?android:attr/textAppearanceSmall"
+        android:paddingTop="4dp"
+        android:textColor="#9E9E9E"
+        android:textSize="12sp"
         tools:text="Description" />
 </LinearLayout>

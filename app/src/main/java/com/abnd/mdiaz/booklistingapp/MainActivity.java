@@ -29,12 +29,11 @@ public class MainActivity extends AppCompatActivity {
 
     public static final String LOG_TAG = MainActivity.class.getSimpleName();
 
-    private static final String BOOKS_QUERY_INIT =
-            "https://www.googleapis.com/books/v1/volumes?q=";
+    private static final String BOOKS_QUERY_INIT = "https://www.googleapis.com/books/v1/volumes?q=";
 
     private static final String BOOKS_MAX_RESULTS_STRING = "&maxResults=";
 
-    private static final int BOOKS_MAX_RESULTS_VALUE = 1;
+    private static final int BOOKS_MAX_RESULTS_VALUE = 6;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,14 +48,6 @@ public class MainActivity extends AppCompatActivity {
 
         BooksAsyncTask task = new BooksAsyncTask(text);
         task.execute();
-    }
-
-    public void fillBookList(ArrayList<Book> books) {
-        ListView bookListView = (ListView) findViewById(R.id.list);
-
-        BookAdapter adapter = new BookAdapter(this, books);
-
-        bookListView.setAdapter(adapter);
     }
 
     private URL createUrl(String stringUrl) {
@@ -106,20 +97,20 @@ public class MainActivity extends AppCompatActivity {
         return jsonResponse;
     }
 
-    private Book extractFeatureFromJson(String bookJSON) {
+    private ArrayList<Book> getBooks(String bookJSON) {
         try {
+
+            ArrayList<Book> books = new ArrayList<>();
+
             JSONObject baseJsonResponse = new JSONObject(bookJSON);
             JSONArray itemArray = baseJsonResponse.getJSONArray("items");
 
-            // If there are results in the features array
-            if (itemArray.length() > 0) {
-                // Extract out the first feature (which is an earthquake)
-                JSONObject item = itemArray.getJSONObject(0);
+            for (int i = 0; i < itemArray.length(); i++) {
+
+                JSONObject item = itemArray.getJSONObject(i);
                 JSONObject volume = item.getJSONObject("volumeInfo");
                 JSONArray authors = volume.optJSONArray("authors");
-                //JSONObject properties = item.getJSONObject("properties");
 
-                // Extract out the title, time, and tsunami values
                 String title = volume.getString("title");
                 String description = volume.optString("description");
 
@@ -131,18 +122,20 @@ public class MainActivity extends AppCompatActivity {
 
                 if (authors != null) {
                     StringBuilder authorsBuilder = new StringBuilder();
-                    for (int i = 0; i < authors.length(); i++) {
-                        authorsBuilder.append(authors.getString(i));
-                        if (i != authors.length() - 1) {
+                    for (int j = 0; j < authors.length(); j++) {
+                        authorsBuilder.append(authors.getString(j));
+                        if (j != authors.length() - 1) {
                             authorsBuilder.append(", ");
                         }
                     }
                     authorsList = authorsBuilder.toString();
                 }
 
-                // Create a new {@link Event} object
-                return new Book(title, authorsList, description);
+                books.add(new Book(title, authorsList, description));
             }
+
+            return books;
+
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing the book JSON results", e);
         }
@@ -163,7 +156,7 @@ public class MainActivity extends AppCompatActivity {
         return output.toString();
     }
 
-    public class BooksAsyncTask extends AsyncTask<URL, Void, Book> {
+    public class BooksAsyncTask extends AsyncTask<URL, Void, ArrayList<Book>> {
 
         private String mText;
 
@@ -172,7 +165,7 @@ public class MainActivity extends AppCompatActivity {
         }
 
         @Override
-        protected Book doInBackground(URL... urls) {
+        protected ArrayList<Book> doInBackground(URL... urls) {
 
             StringBuilder query = new StringBuilder();
             query.append(BOOKS_QUERY_INIT);
@@ -199,18 +192,20 @@ public class MainActivity extends AppCompatActivity {
                 // TODO Handle the IOException
             }
 
-            Book book = extractFeatureFromJson(jsonResponse);
+            ArrayList<Book> books = getBooks(jsonResponse);
 
-            return book;
+            return books;
         }
 
         @Override
-        protected void onPostExecute(Book book) {
-            ArrayList<Book> books = new ArrayList<>();
+        protected void onPostExecute(ArrayList<Book> books) {
 
-            books.add(book);
+            ListView bookListView = (ListView) findViewById(R.id.list);
 
-            fillBookList(books);
+            BookAdapter adapter = new BookAdapter(MainActivity.this, books);
+
+            bookListView.setAdapter(adapter);
+
         }
     }
 }
