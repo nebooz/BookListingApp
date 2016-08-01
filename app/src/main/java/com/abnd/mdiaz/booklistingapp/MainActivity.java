@@ -9,6 +9,7 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,10 +38,14 @@ public class MainActivity extends AppCompatActivity {
 
     private static final int BOOKS_MAX_RESULTS_VALUE = 10;
 
+    private int totalItems;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        getSupportActionBar().setElevation(0);
     }
 
     public void bookSearch(View view) {
@@ -105,17 +110,19 @@ public class MainActivity extends AppCompatActivity {
             ArrayList<Book> books = new ArrayList<>();
 
             JSONObject baseJsonResponse = new JSONObject(bookJSON);
-            JSONArray itemArray = baseJsonResponse.getJSONArray("items");
+            totalItems = baseJsonResponse.getInt("totalItems");
+            if (totalItems != 0) {
+                JSONArray itemArray = baseJsonResponse.getJSONArray("items");
 
-            for (int i = 0; i < itemArray.length(); i++) {
+                for (int i = 0; i < itemArray.length(); i++) {
 
-                JSONObject item = itemArray.getJSONObject(i);
-                JSONObject volume = item.getJSONObject("volumeInfo");
+                    JSONObject item = itemArray.getJSONObject(i);
+                    JSONObject volume = item.getJSONObject("volumeInfo");
 
-                JSONObject imageLinks = volume.optJSONObject("imageLinks");
+                    JSONObject imageLinks = volume.optJSONObject("imageLinks");
 
-                String imageUrl = "";
-                Bitmap bitmap = null;
+                    String imageUrl = "";
+                    Bitmap bitmap = null;
 
                 /*
                 Adding the images is making everything longer...
@@ -124,37 +131,38 @@ public class MainActivity extends AppCompatActivity {
                 individually... it would still require the full ArrayList to fill up the list
                 view.
                 */
-                if (imageLinks != null) {
-                    imageUrl = imageLinks.getString("thumbnail");
-                    bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
-                }
-
-                JSONArray authors = volume.optJSONArray("authors");
-
-                String title = volume.getString("title");
-                String description = volume.optString("description");
-
-                if (Objects.equals(description, "")) {
-                    description = getString(R.string.no_description);
-                }
-
-                String authorsList = getString(R.string.no_authors);
-
-                if (authors != null) {
-                    StringBuilder authorsBuilder = new StringBuilder();
-                    for (int j = 0; j < authors.length(); j++) {
-                        authorsBuilder.append(authors.getString(j));
-                        if (j != authors.length() - 1) {
-                            authorsBuilder.append(", ");
-                        }
+                    if (imageLinks != null) {
+                        imageUrl = imageLinks.getString("thumbnail");
+                        bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
                     }
-                    authorsList = authorsBuilder.toString();
+
+                    JSONArray authors = volume.optJSONArray("authors");
+
+                    String title = volume.getString("title");
+                    String description = volume.optString("description");
+
+                    if (Objects.equals(description, "")) {
+                        description = getString(R.string.no_description);
+                    }
+
+                    String authorsList = getString(R.string.no_authors);
+
+                    if (authors != null) {
+                        StringBuilder authorsBuilder = new StringBuilder();
+                        for (int j = 0; j < authors.length(); j++) {
+                            authorsBuilder.append(authors.getString(j));
+                            if (j != authors.length() - 1) {
+                                authorsBuilder.append(", ");
+                            }
+                        }
+                        authorsList = authorsBuilder.toString();
+                    }
+
+                    books.add(new Book(title, authorsList, description, bitmap));
                 }
 
-                books.add(new Book(title, authorsList, description, bitmap));
+                return books;
             }
-
-            return books;
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing the book JSON results", e);
@@ -163,6 +171,7 @@ public class MainActivity extends AppCompatActivity {
         } catch (IOException e) {
             e.printStackTrace();
         }
+
         return null;
     }
 
@@ -180,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
         return output.toString();
     }
 
-    public class BooksAsyncTask extends AsyncTask<URL, Void, ArrayList<Book>> {
+    public class BooksAsyncTask extends AsyncTask<URL, String, ArrayList<Book>> {
 
         private String mText;
 
@@ -190,6 +199,8 @@ public class MainActivity extends AppCompatActivity {
 
         @Override
         protected ArrayList<Book> doInBackground(URL... urls) {
+
+            this.publishProgress(getString(R.string.in_progress));
 
             StringBuilder query = new StringBuilder();
             query.append(BOOKS_QUERY_INIT);
@@ -218,18 +229,36 @@ public class MainActivity extends AppCompatActivity {
 
             ArrayList<Book> books = getBooks(jsonResponse);
 
+
             return books;
         }
 
         @Override
         protected void onPostExecute(ArrayList<Book> books) {
 
-            ListView bookListView = (ListView) findViewById(R.id.list);
+            TextView infoText = (TextView) findViewById(R.id.info_text);
 
-            BookAdapter adapter = new BookAdapter(MainActivity.this, books);
+            if (totalItems != 0) {
+                //Getting rid of the info_text view once results show up.
+                infoText.setVisibility(View.GONE);
 
-            bookListView.setAdapter(adapter);
+                ListView bookListView = (ListView) findViewById(R.id.list);
+                BookAdapter adapter = new BookAdapter(MainActivity.this, books);
+                bookListView.setAdapter(adapter);
 
+            } else {
+                infoText.setText(R.string.no_results);
+            }
+
+        }
+
+        @Override
+        protected void onProgressUpdate(String... values) {
+            super.onProgressUpdate(values);
+
+            //It works... but not completely clear about the whole process...
+            TextView infoText = (TextView) findViewById(R.id.info_text);
+            infoText.setText(values[0]);
         }
     }
 }
