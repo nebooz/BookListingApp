@@ -58,7 +58,7 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private URL createUrl(String stringUrl) {
-        URL url = null;
+        URL url;
         try {
             url = new URL(stringUrl);
             Log.i(LOG_TAG, stringUrl);
@@ -121,7 +121,7 @@ public class MainActivity extends AppCompatActivity {
 
                     JSONObject imageLinks = volume.optJSONObject("imageLinks");
 
-                    String imageUrl = "";
+                    String imageUrl;
                     Bitmap bitmap = null;
 
                 /*
@@ -227,10 +227,7 @@ public class MainActivity extends AppCompatActivity {
                 e.printStackTrace();
             }
 
-            ArrayList<Book> books = getBooks(jsonResponse);
-
-
-            return books;
+            return getBooks(jsonResponse);
         }
 
         @Override
