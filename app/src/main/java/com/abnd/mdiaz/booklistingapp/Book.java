@@ -1,20 +1,18 @@
 package com.abnd.mdiaz.booklistingapp;
 
-/**
- * Created by neboo on 31-Jul-16.
- */
+import android.graphics.Bitmap;
+
 public class Book {
     private String mTitle;
     private String mAuthors;
     private String mDescription;
-    private String mPublicationYear;
-    private int mIsbn;
+    private Bitmap mImage;
 
-    public Book(String title, String authors, String description) {
+    public Book(String title, String authors, String description, Bitmap image) {
         mTitle = title;
         mAuthors = authors;
         mDescription = description;
-
+        mImage = image;
     }
 
     public String getTitle() {
@@ -27,6 +25,10 @@ public class Book {
 
     public String getDescription() {
         return mDescription;
+    }
+
+    public Bitmap getImage() {
+        return mImage;
     }
 
 }

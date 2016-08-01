@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:minHeight="100dp"
-    android:orientation="vertical"
     android:paddingBottom="8dp"
     android:paddingLeft="8dp"
     android:paddingRight="8dp"
@@ -19,7 +18,10 @@
         android:textColor="#0D47A1"
         android:textSize="16sp"
         android:textStyle="bold"
-        tools:text="Book Title" />
+        tools:text="Book Title"
+        android:layout_marginLeft="8dp"
+        android:layout_alignParentTop="true"
+        android:layout_toEndOf="@+id/book_image" />
 
     <TextView
         android:id="@+id/authors_text"
@@ -30,7 +32,10 @@
         android:textColor="#2196F3"
         android:textSize="12sp"
         android:textStyle="italic"
-        tools:text="Book Authors" />
+        tools:text="Book Authors"
+        android:layout_marginLeft="8dp"
+        android:layout_below="@+id/title_text"
+        android:layout_toEndOf="@+id/book_image" />
 
     <TextView
         android:id="@+id/description_text"
@@ -41,5 +46,17 @@
         android:paddingTop="4dp"
         android:textColor="#9E9E9E"
         android:textSize="12sp"
-        tools:text="Description" />
-</LinearLayout>
+        tools:text="Description"
+        android:layout_marginLeft="8dp"
+        android:layout_below="@+id/authors_text"
+        android:layout_toEndOf="@+id/book_image" />
+
+    <ImageView
+        android:layout_width="84dp"
+        android:layout_height="84dp"
+        tools:src="@drawable/no_image"
+        android:id="@+id/book_image"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+</RelativeLayout>

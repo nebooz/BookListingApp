@@ -1,5 +1,7 @@
 package com.abnd.mdiaz.booklistingapp;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -33,7 +35,7 @@ public class MainActivity extends AppCompatActivity {
 
     private static final String BOOKS_MAX_RESULTS_STRING = "&maxResults=";
 
-    private static final int BOOKS_MAX_RESULTS_VALUE = 6;
+    private static final int BOOKS_MAX_RESULTS_VALUE = 10;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -109,6 +111,17 @@ public class MainActivity extends AppCompatActivity {
 
                 JSONObject item = itemArray.getJSONObject(i);
                 JSONObject volume = item.getJSONObject("volumeInfo");
+
+                JSONObject imageLinks = volume.optJSONObject("imageLinks");
+
+                String imageUrl = "";
+                Bitmap bitmap = null;
+
+                if (imageLinks != null) {
+                    imageUrl = imageLinks.getString("thumbnail");
+                    bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
+                }
+
                 JSONArray authors = volume.optJSONArray("authors");
 
                 String title = volume.getString("title");
@@ -131,13 +144,17 @@ public class MainActivity extends AppCompatActivity {
                     authorsList = authorsBuilder.toString();
                 }
 
-                books.add(new Book(title, authorsList, description));
+                books.add(new Book(title, authorsList, description, bitmap));
             }
 
             return books;
 
         } catch (JSONException e) {
             Log.e(LOG_TAG, "Problem parsing the book JSON results", e);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
         }
         return null;
     }

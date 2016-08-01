@@ -5,13 +5,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
 
-/**
- * Created by neboo on 31-Jul-16.
- */
 public class BookAdapter extends ArrayAdapter<Book> {
 
     public BookAdapter(Context context, ArrayList<Book> books) {
@@ -21,12 +19,20 @@ public class BookAdapter extends ArrayAdapter<Book> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View listItemView = convertView;
-        if(listItemView == null){
+        if (listItemView == null) {
             listItemView = LayoutInflater.from(getContext()).inflate(
-                    R.layout.basic_book_list_item, parent,false);
+                    R.layout.basic_book_list_item, parent, false);
         }
 
         Book book = getItem(position);
+
+        ImageView bookImage = (ImageView) listItemView.findViewById(R.id.book_image);
+
+        if (book.getImage() == null) {
+            bookImage.setImageResource(R.drawable.no_image);
+        } else {
+            bookImage.setImageBitmap(book.getImage());
+        }
 
         TextView titleText = (TextView) listItemView.findViewById(R.id.title_text);
         titleText.setText(book.getTitle());
@@ -40,4 +46,5 @@ public class BookAdapter extends ArrayAdapter<Book> {
         return listItemView;
 
     }
+
 }
