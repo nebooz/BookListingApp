@@ -86,13 +86,13 @@ public class MainActivity extends AppCompatActivity {
             }
 
         } catch (IOException e) {
-            // TODO: Handle the exception
+            e.printStackTrace();
+
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
             }
             if (inputStream != null) {
-                // function must handle java.io.IOException here
                 inputStream.close();
             }
         }
@@ -117,6 +117,13 @@ public class MainActivity extends AppCompatActivity {
                 String imageUrl = "";
                 Bitmap bitmap = null;
 
+                /*
+                Adding the images is making everything longer...
+                I wonder if there is a way to show the elements as they are being obtained.
+                The adapter uses an ArrayList, so, although each Book object could be added
+                individually... it would still require the full ArrayList to fill up the list
+                view.
+                */
                 if (imageLinks != null) {
                     imageUrl = imageLinks.getString("thumbnail");
                     bitmap = BitmapFactory.decodeStream((InputStream) new URL(imageUrl).getContent());
@@ -128,10 +135,10 @@ public class MainActivity extends AppCompatActivity {
                 String description = volume.optString("description");
 
                 if (Objects.equals(description, "")) {
-                    description = "No description available.";
+                    description = getString(R.string.no_description);
                 }
 
-                String authorsList = "No authors defined.";
+                String authorsList = getString(R.string.no_authors);
 
                 if (authors != null) {
                     StringBuilder authorsBuilder = new StringBuilder();
@@ -206,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                 jsonResponse = makeHttpRequest(url);
 
             } catch (IOException e) {
-                // TODO Handle the IOException
+                e.printStackTrace();
             }
 
             ArrayList<Book> books = getBooks(jsonResponse);
